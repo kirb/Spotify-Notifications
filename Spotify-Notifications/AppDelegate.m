@@ -8,6 +8,7 @@
 #import "AppDelegate.h"
 #import "SharedKeys.h"
 #import "LaunchAtLogin.h"
+#import <UserNotifications/UserNotifications.h>
 
 @implementation AppDelegate
 
@@ -15,7 +16,25 @@
     
     //Register default preferences values
     [NSUserDefaults.standardUserDefaults registerDefaults:[NSDictionary dictionaryWithContentsOfFile:[NSBundle.mainBundle pathForResource:@"UserDefaults" ofType:@"plist"]]];
-    
+
+    if (@available(macOS 10.14, *)) {
+        // Get permission for notifications
+        [[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:UNAuthorizationOptionAlert | UNAuthorizationOptionSound completionHandler:^(BOOL granted, NSError * _Nullable error) {
+            if (error != nil) {
+                NSLog(@"UNUserNotificationCenter error: %@", error);
+            }
+        }];
+
+        // Get permission for Apple Events
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+            NSAppleEventDescriptor *descriptor = [NSAppleEventDescriptor descriptorWithBundleIdentifier:SpotifyBundleID];
+            OSStatus status = AEDeterminePermissionToAutomateTarget(descriptor.aeDesc, typeWildCard, typeWildCard, YES);
+            if (status != noErr) {
+                NSLog(@"AEDeterminePermissionToAutomateTarget error: %d", status);
+            }
+        });
+    }
+
     spotify =  [SBApplication applicationWithBundleIdentifier:SpotifyBundleID];
 
     [NSUserNotificationCenter.defaultUserNotificationCenter setDelegate:self];

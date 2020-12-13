@@ -34,5 +34,7 @@
 	<string>NSApplication</string>
 	<key>NSUserNotificationAlertStyle</key>
 	<string>banner</string>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>Required for now playing notifications.</string>
 </dict>
 </plist>

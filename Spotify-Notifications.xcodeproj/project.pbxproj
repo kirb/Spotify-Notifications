@@ -16,6 +16,7 @@
 		04A77BB9170FC75300A50173 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 04A77BB7170FC75300A50173 /* MainMenu.xib */; };
 		04A77BC317104FEE00A50173 /* status_bar_colour.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 04A77BC217104FEE00A50173 /* status_bar_colour.tiff */; };
 		04C5E40718133BB000956039 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04C5E40618133BB000956039 /* Images.xcassets */; };
+		4E6F3B4D25862BEC00CD6DC4 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E6F3B4C25862BEC00CD6DC4 /* UserNotifications.framework */; };
 		961C56761BC93CFF00E0BF5A /* UserDefaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 961C56751BC93CFF00E0BF5A /* UserDefaults.plist */; };
 		96694FAE1BCD39D5009CAFC8 /* ScriptingBridge.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96694FAD1BCD39D5009CAFC8 /* ScriptingBridge.framework */; };
 		967E38471BCD480D001335BA /* MASShortcut.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 967E38401BCD47F5001335BA /* MASShortcut.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -87,6 +88,7 @@
 		04A77BC1170FC7E600A50173 /* Spotify Notifications.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "Spotify Notifications.entitlements"; sourceTree = "<group>"; };
 		04A77BC217104FEE00A50173 /* status_bar_colour.tiff */ = {isa = PBXFileReference; lastKnownFileType = image.tiff; path = status_bar_colour.tiff; sourceTree = "<group>"; };
 		04C5E40618133BB000956039 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		4E6F3B4C25862BEC00CD6DC4 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		961C56751BC93CFF00E0BF5A /* UserDefaults.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = UserDefaults.plist; sourceTree = "<group>"; };
 		96694FAC1BCD39BC009CAFC8 /* Spotify.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Spotify.h; sourceTree = "<group>"; };
 		96694FAD1BCD39D5009CAFC8 /* ScriptingBridge.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScriptingBridge.framework; path = System/Library/Frameworks/ScriptingBridge.framework; sourceTree = SDKROOT; };
@@ -103,6 +105,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E6F3B4D25862BEC00CD6DC4 /* UserNotifications.framework in Frameworks */,
 				967E38481BCD4839001335BA /* MASShortcut.framework in Frameworks */,
 				96694FAE1BCD39D5009CAFC8 /* ScriptingBridge.framework in Frameworks */,
 				049BCBF218170F5E00743860 /* Carbon.framework in Frameworks */,
@@ -148,6 +151,7 @@
 		04A77BA1170FC75200A50173 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4E6F3B4C25862BEC00CD6DC4 /* UserNotifications.framework */,
 				96694FAD1BCD39D5009CAFC8 /* ScriptingBridge.framework */,
 				049BCBF118170F5E00743860 /* Carbon.framework */,
 				04A77BA2170FC75200A50173 /* Cocoa.framework */,
