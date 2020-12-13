@@ -59,7 +59,7 @@
     if (spotify.isRunning && spotify.playerState == SpotifyEPlSPlaying) {
         currentTrack = spotify.currentTrack;
         
-        NSUserNotification *notification = [self userNotificationForCurrentTrack];
+        UNNotificationRequest *notification = [self userNotificationForCurrentTrack];
         [self deliverUserNotification:notification Force:YES];
     }
 }
@@ -76,17 +76,8 @@
     [MASShortcutBinder.sharedBinder
      bindShortcutWithDefaultsKey:kPreferenceGlobalShortcut
      toAction:^{
-         
-         NSUserNotification *notification = [self userNotificationForCurrentTrack];
-         
-         if (currentTrack.name.length == 0) {
-             
-             notification.title = @"No Song Playing";
-             
-             if ([NSUserDefaults.standardUserDefaults boolForKey:kNotificationSoundKey])
-                 notification.soundName = @"Pop";
-         }
-         
+
+        UNNotificationRequest *notification = [self userNotificationForCurrentTrack];
          [self deliverUserNotification:notification Force:YES];
      }];
 }
@@ -131,68 +122,64 @@
     }
 }
 
-- (NSImage*)albumArtForTrack:(SpotifyTrack*)track {
+- (NSURL*)albumArtForTrack:(SpotifyTrack*)track {
     if (track.id) {
         //Looks hacky, but appears to work
         NSString *artworkUrl = [track.artworkUrl stringByReplacingOccurrencesOfString:@"http:" withString:@"https:"];
         NSData *artD = [NSData dataWithContentsOfURL:[NSURL URLWithString:artworkUrl]];
-        
-        if (artD) return [[NSImage alloc] initWithData:artD];
+        if (artD == nil) {
+            return nil;
+        }
+
+        NSURL *tempURL = [[NSFileManager defaultManager].temporaryDirectory URLByAppendingPathComponent:@"spotify-notifications.jpg"];
+        if ([artD writeToURL:tempURL options:kNilOptions error:nil]) {
+            return tempURL;
+        }
     }
     
     return  nil;
 }
 
-- (NSUserNotification*)userNotificationForCurrentTrack {
+- (UNNotificationRequest *)userNotificationForCurrentTrack {
     NSString *title = currentTrack.name;
     NSString *album = currentTrack.album;
     NSString *artist = currentTrack.artist;
     
     BOOL isAdvert = [currentTrack.spotifyUrl hasPrefix:@"spotify:ad"];
-    
-    NSUserNotification *notification = [NSUserNotification new];
+
+    UNMutableNotificationContent *notification = [[UNMutableNotificationContent alloc] init];
+    notification.categoryIdentifier = @"nowplaying";
     notification.title = (title.length > 0 && !isAdvert)? title : @"No Song Playing";
     if (album.length > 0 && !isAdvert) notification.subtitle = album;
-    if (artist.length > 0 && !isAdvert) notification.informativeText = artist;
+    if (artist.length > 0 && !isAdvert) notification.body = artist;
     
     BOOL includeAlbumArt = (userNotificationContentImagePropertyAvailable &&
                            [NSUserDefaults.standardUserDefaults boolForKey:kNotificationIncludeAlbumArtKey]
                             && !isAdvert);
     
-    if (includeAlbumArt) notification.contentImage = [self albumArtForTrack:currentTrack];
+    if (includeAlbumArt) {
+        NSURL *artworkURL = [self albumArtForTrack:currentTrack];
+        UNNotificationAttachment *attachment = [UNNotificationAttachment attachmentWithIdentifier:[NSUUID UUID].UUIDString URL:artworkURL options:@{} error:nil];
+        if (attachment != nil) {
+            notification.attachments = @[ attachment ];
+        }
+    }
     
     if (!isAdvert) {
         if ([NSUserDefaults.standardUserDefaults boolForKey:kNotificationSoundKey]) {
             if (@available(macOS 11, *)) {
-                notification.soundName = @"Boop";
+                notification.sound = [UNNotificationSound soundNamed:@"Boop"];
             } else {
-                notification.soundName = @"Pop";
+                notification.sound = [UNNotificationSound soundNamed:@"Pop"];
             }
         }
-        
-        notification.hasActionButton = YES;
-        notification.actionButtonTitle = @"Skip";
-        
-        
-        //Private APIs – remove if publishing to Mac App Store
-        @try {
-            //Force showing buttons even if "Banner" alert style is chosen by user
-            [notification setValue:@YES forKey:@"_showsButtons"];
-            
-            //Show album art on the left side of the notification (where app icon normally is),
-            //like iTunes does
-            if (includeAlbumArt && notification.contentImage.isValid) {
-                [notification setValue:notification.contentImage forKey:@"_identityImage"];
-                notification.contentImage = nil;
-            }
-            
-        } @catch (NSException *exception) {}
     }
-    
-    return notification;
+
+    UNNotificationRequest *request = [UNNotificationRequest requestWithIdentifier:[NSUUID UUID].UUIDString content:notification trigger:nil];
+    return request;
 }
 
-- (void)deliverUserNotification:(NSUserNotification*)notification Force:(BOOL)force {
+- (void)deliverUserNotification:(UNNotificationRequest *)notification Force:(BOOL)force {
     BOOL frontmost = [NSWorkspace.sharedWorkspace.frontmostApplication.bundleIdentifier isEqualToString:SpotifyBundleID];
     
     if (frontmost && [NSUserDefaults.standardUserDefaults boolForKey:kDisableWhenSpotifyHasFocusKey]) return;
@@ -211,8 +198,10 @@
         deliver = YES;
     }
     
-    if (spotify.isRunning && deliver)
-        [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:notification];
+    if (spotify.isRunning && deliver) {
+        [[UNUserNotificationCenter currentNotificationCenter] removeAllDeliveredNotifications];
+        [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:notification withCompletionHandler:nil];
+    }
 }
 
 - (void)notPlaying {
@@ -241,8 +230,8 @@
             previousTrack = currentTrack;
             currentTrack = spotify.currentTrack;
         }
-        
-        NSUserNotification *userNotification = [self userNotificationForCurrentTrack];
+
+        UNNotificationRequest *userNotification = [self userNotificationForCurrentTrack];
         [self deliverUserNotification:userNotification Force:NO];
         
         
