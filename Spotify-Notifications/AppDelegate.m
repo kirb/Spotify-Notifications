@@ -162,8 +162,13 @@
     if (includeAlbumArt) notification.contentImage = [self albumArtForTrack:currentTrack];
     
     if (!isAdvert) {
-        if ([NSUserDefaults.standardUserDefaults boolForKey:kNotificationSoundKey])
-            notification.soundName = @"Pop";
+        if ([NSUserDefaults.standardUserDefaults boolForKey:kNotificationSoundKey]) {
+            if (@available(macOS 11, *)) {
+                notification.soundName = @"Boop";
+            } else {
+                notification.soundName = @"Pop";
+            }
+        }
         
         notification.hasActionButton = YES;
         notification.actionButtonTitle = @"Skip";
