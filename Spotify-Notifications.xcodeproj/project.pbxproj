@@ -132,7 +132,10 @@
 				04A77BA1170FC75200A50173 /* Frameworks */,
 				04A77BA0170FC75200A50173 /* Products */,
 			);
+			indentWidth = 4;
 			sourceTree = "<group>";
+			tabWidth = 4;
+			usesTabs = 0;
 		};
 		04A77BA0170FC75200A50173 /* Products */ = {
 			isa = PBXGroup;
